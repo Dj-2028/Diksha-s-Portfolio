@@ -1,142 +1,191 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { motion } from "framer-motion";
-import { Save, X } from "lucide-react";
-import { projectService } from "../../services/projectService";
+import { useState } from "react";
+import { ArrowLeft, Save } from "lucide-react";
 
-const schema = z.object({
-    title: z.string().min(3, "Title required"),
-    description: z.string().min(10, "Description required"),
-    longDescription: z.string().optional(),
-    tags: z.string().min(1, "At least one tag required"),
-    category: z.enum(["frontend", "fullstack", "backend"]),
-    githubUrl: z.string().url("Must be a valid URL").or(z.literal("")),
-    demoUrl: z.string().url("Must be a valid URL").or(z.literal("")),
-    imageUrl: z.string().optional(),
-    featured: z.boolean().optional(),
-    order: z.coerce.number().optional(),
-});
+const CATEGORIES = [
+    { label: "Web", value: "web" },
+    { label: "AI / CV", value: "ai-cv" },
+    { label: "Design", value: "design" },
+    { label: "Hackathon", value: "hackathon" },
+];
 
 export default function ProjectForm({ project, onSave, onCancel }) {
-    const isEdit = !!project;
-    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(schema),
-        defaultValues: {
-            title: project?.title || "",
-            description: project?.description || "",
-            longDescription: project?.longDescription || "",
-            tags: project?.tags?.join(", ") || "",
-            category: project?.category || "fullstack",
-            githubUrl: project?.githubUrl || "",
-            demoUrl: project?.demoUrl || "",
-            imageUrl: project?.imageUrl || "",
-            featured: project?.featured || false,
-            order: project?.order || 0,
-        },
+    const [form, setForm] = useState({
+        title: project?.title || "",
+        description: project?.description || "",
+        tech_stack: project?.tech_stack?.join(", ") || "",
+        category: project?.category || "web",
+        github_url: project?.github_url || "",
+        live_url: project?.live_url || "",
+        achievement: project?.achievement || "",
+        featured: project?.featured || false,
+        display_order: project?.display_order || 0,
     });
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
 
-    const onSubmit = async (data) => {
-        const payload = {
-            ...data,
-            tags: data.tags.split(",").map((t) => t.trim()).filter(Boolean),
-        };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!form.title.trim()) {
+            setError("Title is required");
+            return;
+        }
+        setSaving(true);
+        setError("");
         try {
-            if (isEdit) {
-                await projectService.update(project._id, payload);
-            } else {
-                await projectService.create(payload);
-            }
-            reset();
-            onSave();
+            await onSave({
+                title: form.title.trim(),
+                description: form.description.trim(),
+                tech_stack: form.tech_stack
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
+                category: form.category,
+                github_url: form.github_url.trim() || null,
+                live_url: form.live_url.trim() || null,
+                achievement: form.achievement.trim() || null,
+                featured: form.featured,
+                display_order: parseInt(form.display_order) || 0,
+            });
         } catch (err) {
-            alert("Error saving project. Check console.");
-            console.error(err);
+            setError(err.message || "Failed to save");
+        } finally {
+            setSaving(false);
         }
     };
 
-    const inputClass = "w-full px-3 py-2 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 text-sm transition-all";
+    const inputClass =
+        "w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all text-sm";
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-2xl p-6 mb-6"
-        >
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="font-display font-bold text-lg text-foreground">
-                    {isEdit ? "Edit Project" : "Add New Project"}
-                </h3>
-                <button onClick={onCancel} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
-                    <X size={18} />
-                </button>
-            </div>
+        <div>
+            <button
+                onClick={onCancel}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+            >
+                <ArrowLeft size={16} /> Back to Projects
+            </button>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <h2 className="font-display text-xl font-bold text-foreground mb-6">
+                {project ? "Edit Project" : "New Project"}
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
+                <div>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Title *</label>
+                    <input
+                        value={form.title}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        placeholder="Project name"
+                        className={inputClass}
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+                    <textarea
+                        value={form.description}
+                        onChange={(e) => setForm({ ...form, description: e.target.value })}
+                        rows={4}
+                        placeholder="Project description..."
+                        className={`${inputClass} resize-none`}
+                    />
+                </div>
+
                 <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Title *</label>
-                        <input {...register("title")} placeholder="Project Title" className={inputClass} />
-                        {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>}
+                        <label className="block text-sm font-medium text-foreground mb-1.5">Tech Stack</label>
+                        <input
+                            value={form.tech_stack}
+                            onChange={(e) => setForm({ ...form, tech_stack: e.target.value })}
+                            placeholder="React, Node.js, Supabase"
+                            className={inputClass}
+                        />
+                        <p className="mt-1 text-xs text-muted-foreground">Comma-separated</p>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Category *</label>
-                        <select {...register("category")} className={inputClass}>
-                            <option value="fullstack">Full Stack</option>
-                            <option value="frontend">Frontend</option>
-                            <option value="backend">Backend</option>
+                        <label className="block text-sm font-medium text-foreground mb-1.5">Category</label>
+                        <select
+                            value={form.category}
+                            onChange={(e) => setForm({ ...form, category: e.target.value })}
+                            className={inputClass}
+                        >
+                            {CATEGORIES.map(({ label, value }) => (
+                                <option key={value} value={value}>{label}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">Description *</label>
-                    <textarea {...register("description")} rows={2} placeholder="Short description..." className={`${inputClass} resize-none`} />
-                    {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">Long Description</label>
-                    <textarea {...register("longDescription")} rows={3} placeholder="Detailed description..." className={`${inputClass} resize-none`} />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">Tags (comma separated) *</label>
-                    <input {...register("tags")} placeholder="React, Node.js, MongoDB" className={inputClass} />
-                    {errors.tags && <p className="mt-1 text-xs text-red-500">{errors.tags.message}</p>}
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1.5">GitHub URL</label>
+                        <input
+                            value={form.github_url}
+                            onChange={(e) => setForm({ ...form, github_url: e.target.value })}
+                            placeholder="https://github.com/..."
+                            className={inputClass}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1.5">Live URL</label>
+                        <input
+                            value={form.live_url}
+                            onChange={(e) => setForm({ ...form, live_url: e.target.value })}
+                            placeholder="https://..."
+                            className={inputClass}
+                        />
+                    </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">GitHub URL</label>
-                        <input {...register("githubUrl")} placeholder="https://github.com/..." className={inputClass} />
-                        {errors.githubUrl && <p className="mt-1 text-xs text-red-500">{errors.githubUrl.message}</p>}
+                        <label className="block text-sm font-medium text-foreground mb-1.5">Achievement</label>
+                        <input
+                            value={form.achievement}
+                            onChange={(e) => setForm({ ...form, achievement: e.target.value })}
+                            placeholder="e.g. 2nd Place – IIT Kanpur"
+                            className={inputClass}
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Demo URL</label>
-                        <input {...register("demoUrl")} placeholder="https://demo.example.com" className={inputClass} />
-                        {errors.demoUrl && <p className="mt-1 text-xs text-red-500">{errors.demoUrl.message}</p>}
+                        <label className="block text-sm font-medium text-foreground mb-1.5">Display Order</label>
+                        <input
+                            type="number"
+                            value={form.display_order}
+                            onChange={(e) => setForm({ ...form, display_order: e.target.value })}
+                            className={inputClass}
+                        />
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
-                    <input type="checkbox" id="featured" {...register("featured")} className="w-4 h-4 accent-primary" />
-                    <label htmlFor="featured" className="text-sm text-foreground">Mark as Featured</label>
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id="featured"
+                        checked={form.featured}
+                        onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                        className="rounded"
+                    />
+                    <label htmlFor="featured" className="text-sm text-foreground">
+                        Featured project
+                    </label>
                 </div>
 
-                <div className="flex gap-3 pt-2">
-                    <button type="submit" disabled={isSubmitting}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl gradient-primary text-white font-semibold shadow-glow text-sm disabled:opacity-60">
-                        <Save size={15} />
-                        {isSubmitting ? "Saving..." : isEdit ? "Update Project" : "Create Project"}
-                    </button>
-                    <button type="button" onClick={onCancel}
-                        className="px-5 py-2.5 rounded-xl border border-border text-foreground text-sm hover:bg-muted transition-colors">
-                        Cancel
-                    </button>
-                </div>
+                {error && (
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-500">
+                        {error}
+                    </div>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={saving}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl gradient-primary text-white font-semibold shadow-glow hover:shadow-glow-accent transition-all disabled:opacity-60"
+                >
+                    <Save size={16} />
+                    {saving ? "Saving..." : "Save Project"}
+                </button>
             </form>
-        </motion.div>
+        </div>
     );
 }

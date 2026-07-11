@@ -4,15 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion } from "framer-motion";
 import { Send, Mail, CheckCircle, AlertCircle } from "lucide-react";
-import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import SectionHeading from "../common/SectionHeading";
 import { SOCIAL_LINKS } from "../../lib/constants";
-import api from "../../lib/axios";
+import { contactService } from "../../services/contactService";
 
 const schema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Please enter a valid email"),
-    subject: z.string().min(5, "Subject must be at least 5 characters"),
     message: z.string().min(20, "Message must be at least 20 characters"),
 });
 
@@ -27,7 +25,7 @@ export default function Contact() {
 
     const onSubmit = async (data) => {
         try {
-            await api.post("/contact", data);
+            await contactService.submit(data);
             setStatus("success");
             reset();
             setTimeout(() => setStatus(null), 5000);
@@ -38,7 +36,7 @@ export default function Contact() {
     };
 
     return (
-        <section id="contact" className="py-20 md:py-32">
+        <section id="contact" className="py-20 md:py-32 bg-muted/30">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <SectionHeading
                     label="Contact"
@@ -56,18 +54,18 @@ export default function Contact() {
                         className="space-y-6"
                     >
                         <p className="text-muted-foreground leading-relaxed">
-                            I'm currently open to freelance work, full-time roles, and interesting collaborations. Whether you have a question or just want to chat about tech — reach out!
+                            I'm currently open to internship opportunities, full-time roles, and interesting collaborations in full-stack development, Edge AI, or design. Let's build something great together!
                         </p>
 
                         <div className="space-y-4">
-                            <a href="mailto:diksha@example.com"
+                            <a href="mailto:dikshajain2026@gmail.com"
                                 className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border hover:border-primary/40 transition-all group">
                                 <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
                                     <Mail size={18} />
                                 </div>
                                 <div>
                                     <div className="text-sm text-muted-foreground">Email</div>
-                                    <div className="text-foreground font-medium text-sm">diksha@example.com</div>
+                                    <div className="text-foreground font-medium text-sm">dikshajain2026@gmail.com</div>
                                 </div>
                             </a>
 
@@ -79,7 +77,7 @@ export default function Contact() {
                                     </div>
                                     <div>
                                         <div className="text-sm text-muted-foreground">{label}</div>
-                                        <div className="text-foreground font-medium text-sm">@dikshajain</div>
+                                        <div className="text-foreground font-medium text-sm truncate max-w-[200px]">{href.replace("https://", "")}</div>
                                     </div>
                                 </a>
                             ))}
@@ -118,20 +116,10 @@ export default function Contact() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-foreground mb-1.5">Subject</label>
-                            <input
-                                {...register("subject")}
-                                placeholder="What's this about?"
-                                className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all text-sm"
-                            />
-                            {errors.subject && <p className="mt-1 text-xs text-red-500">{errors.subject.message}</p>}
-                        </div>
-
-                        <div>
                             <label className="block text-sm font-medium text-foreground mb-1.5">Message</label>
                             <textarea
                                 {...register("message")}
-                                rows={5}
+                                rows={6}
                                 placeholder="Tell me about your project or idea..."
                                 className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all text-sm resize-none"
                             />

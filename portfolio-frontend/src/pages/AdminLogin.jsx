@@ -33,8 +33,8 @@ export default function AdminLogin() {
         try {
             await login(data.email, data.password);
             navigate("/admin");
-        } catch {
-            setError("Invalid email or password");
+        } catch (err) {
+            setError(err.message || "Invalid email or password");
         }
     };
 
@@ -119,7 +119,7 @@ export default function AdminLogin() {
                 </form>
 
                 <p className="text-center text-xs text-muted-foreground mt-4">
-                    Default: admin@portfolio.com / Admin@123456
+                    Sign in with your Supabase Auth credentials
                 </p>
             </motion.div>
         </div>

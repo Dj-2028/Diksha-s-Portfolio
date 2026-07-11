@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, ArrowDown, ChevronDown } from "lucide-react";
+import { Download, ArrowDown, ChevronDown, ExternalLink } from "lucide-react";
 import { SOCIAL_LINKS } from "../../lib/constants";
 
 const roles = [
-    "MERN Stack Developer",
-    "Full Stack Engineer",
-    "React Developer",
-    "Node.js Developer",
+    "Full Stack Developer",
+    "Edge AI/CV Engineer",
+    "Visual Designer",
+    "Graphic Head @ JLUG",
 ];
 
 export default function Hero() {
@@ -88,9 +88,10 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.6 }}
-                    className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto mb-10"
+                    className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-10"
                 >
-                    I build fast, scalable, and beautiful web applications using the MERN stack. Turning ideas into production-ready products.
+                    Full Stack Developer × Edge AI/CV Engineer × Visual Designer.
+                    Building production-grade web apps, on-device AI pipelines, and brand systems — with a design eye.
                 </motion.p>
 
                 {/* CTAs */}
@@ -118,6 +119,15 @@ export default function Hero() {
                     >
                         <Download size={16} />
                         Download Resume
+                    </a>
+                    <a
+                        href="https://graphic-portfolio-nine.vercel.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-accent/40 bg-accent/5 text-accent font-semibold hover:bg-accent hover:text-white transition-all duration-300 hover:scale-105"
+                    >
+                        <ExternalLink size={16} />
+                        Design Portfolio
                     </a>
                 </motion.div>
 

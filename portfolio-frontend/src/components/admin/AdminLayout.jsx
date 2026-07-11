@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { LogOut, LayoutDashboard, FolderGit2, Mail } from "lucide-react";
+import { LogOut, LayoutDashboard, FolderGit2, Mail, Briefcase, Trophy } from "lucide-react";
 import ThemeToggle from "../common/ThemeToggle";
 import { cn } from "../../lib/utils";
 
@@ -11,6 +11,8 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
 
     const tabs = [
         { id: "projects", label: "Projects", Icon: FolderGit2 },
+        { id: "experience", label: "Experience", Icon: Briefcase },
+        { id: "achievements", label: "Achievements", Icon: Trophy },
         { id: "contacts", label: "Contacts", Icon: Mail },
     ];
 
@@ -25,6 +27,12 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
                         <span className="hidden sm:inline text-sm text-muted-foreground">· {admin?.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
+                        <a
+                            href="/"
+                            className="hidden sm:flex items-center gap-1 px-3 py-2 text-sm rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                        >
+                            View Site
+                        </a>
                         <ThemeToggle />
                         <button
                             onClick={logout}

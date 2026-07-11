@@ -25,7 +25,7 @@ export default function About() {
                 <SectionHeading
                     label="About Me"
                     title="Who I Am"
-                    subtitle="A passionate full-stack developer who loves crafting seamless digital experiences."
+                    subtitle="Technical builder with a design eye — bridging code, AI, and visual identity."
                 />
 
                 <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -41,7 +41,7 @@ export default function About() {
                             {/* Decorative border */}
                             <div className="absolute -inset-4 rounded-3xl gradient-primary opacity-20 blur-xl" />
                             <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden border-2 border-primary/30 shadow-glow">
-                                {/* Placeholder profile image */}
+                                {/* Profile monogram */}
                                 <div className="w-full h-full bg-gradient-to-br from-primary/20 via-accent/10 to-primary/5 flex items-center justify-center">
                                     <span className="font-display text-7xl font-bold gradient-text">DJ</span>
                                 </div>
@@ -52,7 +52,7 @@ export default function About() {
                                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                                 className="absolute -bottom-4 -right-4 px-4 py-2 rounded-xl glass border border-primary/30 shadow-glow"
                             >
-                                <span className="text-sm font-display font-bold gradient-text">MERN Stack 🚀</span>
+                                <span className="text-sm font-display font-bold gradient-text">Code × Design 🎨</span>
                             </motion.div>
                         </div>
                     </motion.div>
@@ -66,13 +66,22 @@ export default function About() {
                         className="space-y-5"
                     >
                         <p className="text-muted-foreground leading-relaxed text-base md:text-lg">
-                            I'm <span className="text-foreground font-semibold">Diksha Jain</span>, a passionate MERN Stack Developer with a deep love for building scalable, production-ready web applications. Every project I take on is an opportunity to craft something meaningful.
+                            I'm <span className="text-foreground font-semibold">Diksha Jain</span>, a B.Tech IT student at{" "}
+                            <span className="text-primary font-medium">Jabalpur Engineering College</span> (2024–present),
+                            currently interning as a Full Stack Developer at{" "}
+                            <span className="text-primary font-medium">Gyaini</span> with a focus on Edge AI and Computer Vision.
                         </p>
                         <p className="text-muted-foreground leading-relaxed">
-                            I specialize in <span className="text-primary font-medium">React</span>, <span className="text-primary font-medium">Node.js</span>, <span className="text-primary font-medium">Express</span>, and <span className="text-primary font-medium">MongoDB</span> — building everything from real-time apps to RESTful APIs. I care deeply about clean code, good architecture, and user experience.
+                            I sit at the intersection of{" "}
+                            <span className="text-primary font-medium">full-stack development</span>,{" "}
+                            <span className="text-primary font-medium">AI/CV engineering</span>, and{" "}
+                            <span className="text-primary font-medium">graphic design</span>. As the{" "}
+                            <span className="text-foreground font-semibold">Graphic Head at JLUG</span> (JEC Linux Users Group),
+                            I bring a designer's sensibility to every technical project I build.
                         </p>
                         <p className="text-muted-foreground leading-relaxed">
-                            When I'm not coding, you'll find me exploring new technologies, contributing to open source, or writing about web development.
+                            From winning hackathons at IIT Kanpur to building multimodal VLM inference engines in C++, I love
+                            shipping things that are both technically deep and visually polished.
                         </p>
 
                         <div className="pt-2">

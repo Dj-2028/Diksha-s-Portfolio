@@ -6,7 +6,7 @@ export default function Footer() {
         <footer className="border-t border-border bg-background py-8">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-muted-foreground">
-                    © {year} <span className="gradient-text font-semibold">Diksha Jain</span>. Built with MERN Stack.
+                    © {year} <span className="gradient-text font-semibold">Diksha Jain</span>. Built with React + Supabase + Framer Motion.
                 </p>
                 <div className="flex gap-4">
                     {SOCIAL_LINKS.map(({ Icon, href, label }) => (

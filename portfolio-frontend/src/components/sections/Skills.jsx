@@ -34,14 +34,15 @@ function SkillBar({ name, level, Icon, color, inView }) {
 }
 
 export default function Skills() {
-    const [activeCategory, setActiveCategory] = useState("frontend");
+    const [activeCategory, setActiveCategory] = useState("languages");
     const [ref, inView] = useIntersectionObserver();
 
     const labels = {
+        languages: "Languages",
         frontend: "Frontend",
-        backend: "Backend",
-        database: "Database",
-        devops: "DevOps",
+        "backend-db": "Backend / DB",
+        "ai-cv": "AI / CV",
+        tools: "Tools",
     };
 
     return (
@@ -50,7 +51,7 @@ export default function Skills() {
                 <SectionHeading
                     label="Skills"
                     title="What I Work With"
-                    subtitle="A curated set of tools and technologies I've mastered across the full stack."
+                    subtitle="Languages, frameworks, AI tools, and design systems I've built with across the stack."
                 />
 
                 {/* Category tabs */}

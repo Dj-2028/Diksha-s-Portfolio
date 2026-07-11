@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../lib/axios";
+import { supabase } from "../lib/supabase";
 
 const AuthContext = createContext();
 
@@ -8,31 +8,41 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("portfolio_token");
-        if (token) {
-            api.get("/auth/me")
-                .then((res) => setAdmin(res.data.data))
-                .catch(() => localStorage.removeItem("portfolio_token"))
-                .finally(() => setLoading(false));
-        } else {
+        // Check current session on mount
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setAdmin(session?.user ?? null);
             setLoading(false);
-        }
+        });
+
+        // Listen for auth state changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setAdmin(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const login = async (email, password) => {
-        const res = await api.post("/auth/login", { email, password });
-        localStorage.setItem("portfolio_token", res.data.token);
-        setAdmin(res.data.admin);
-        return res.data;
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+        if (error) throw error;
+        setAdmin(data.user);
+        return data;
     };
 
-    const logout = () => {
-        localStorage.removeItem("portfolio_token");
+    const logout = async () => {
+        await supabase.auth.signOut();
         setAdmin(null);
     };
 
     return (
-        <AuthContext.Provider value={{ admin, login, logout, loading, isAuthenticated: !!admin }}>
+        <AuthContext.Provider
+            value={{ admin, login, logout, loading, isAuthenticated: !!admin }}
+        >
             {children}
         </AuthContext.Provider>
     );

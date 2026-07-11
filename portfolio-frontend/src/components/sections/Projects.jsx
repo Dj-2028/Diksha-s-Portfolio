@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Star, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, Star, X, Trophy } from "lucide-react";
 import { FaGithub as Github } from "react-icons/fa";
 import SectionHeading from "../common/SectionHeading";
-import { PROJECT_CATEGORIES } from "../../lib/constants";
+import { PROJECT_CATEGORIES, FALLBACK_PROJECTS } from "../../lib/constants";
 import { cn } from "../../lib/utils";
-import api from "../../lib/axios";
+import { projectService } from "../../services/projectService";
 
 function ProjectCard({ project, onOpen }) {
     return (
@@ -29,6 +29,11 @@ function ProjectCard({ project, onOpen }) {
                         <Star size={10} fill="currentColor" /> Featured
                     </span>
                 )}
+                {project.achievement && (
+                    <span className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-500 border border-yellow-500/30">
+                        <Trophy size={10} /> {project.achievement}
+                    </span>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
                     <span className="text-sm text-white font-medium">Click to view details</span>
                 </div>
@@ -42,26 +47,26 @@ function ProjectCard({ project, onOpen }) {
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                    {project.tags?.slice(0, 4).map((tag) => (
+                    {project.tech_stack?.slice(0, 4).map((tag) => (
                         <span key={tag} className="px-2 py-0.5 rounded-md text-xs bg-muted text-muted-foreground font-medium">
                             {tag}
                         </span>
                     ))}
-                    {project.tags?.length > 4 && (
-                        <span className="px-2 py-0.5 rounded-md text-xs bg-muted text-muted-foreground">+{project.tags.length - 4}</span>
+                    {project.tech_stack?.length > 4 && (
+                        <span className="px-2 py-0.5 rounded-md text-xs bg-muted text-muted-foreground">+{project.tech_stack.length - 4}</span>
                     )}
                 </div>
 
                 {/* Links */}
                 <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
-                    {project.githubUrl && (
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
+                    {project.github_url && (
+                        <a href={project.github_url} target="_blank" rel="noopener noreferrer"
                             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium">
                             <Github size={14} /> Code
                         </a>
                     )}
-                    {project.demoUrl && (
-                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"
+                    {project.live_url && (
+                        <a href={project.live_url} target="_blank" rel="noopener noreferrer"
                             className="flex items-center gap-1.5 text-xs text-primary hover:text-accent transition-colors font-medium">
                             <ExternalLink size={14} /> Live Demo
                         </a>
@@ -99,33 +104,40 @@ function ProjectModal({ project, onClose }) {
                         </button>
                     </div>
                     <div className="p-6 space-y-4">
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-3">
                             <h3 className="font-display text-2xl font-bold text-foreground">{project.title}</h3>
-                            {project.featured && (
-                                <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-accent/20 text-accent border border-accent/30">
-                                    <Star size={10} fill="currentColor" /> Featured
-                                </span>
-                            )}
+                            <div className="flex gap-2 flex-shrink-0">
+                                {project.featured && (
+                                    <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-accent/20 text-accent border border-accent/30">
+                                        <Star size={10} fill="currentColor" /> Featured
+                                    </span>
+                                )}
+                                {project.achievement && (
+                                    <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-500 border border-yellow-500/30">
+                                        <Trophy size={10} /> {project.achievement}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                         <p className="text-muted-foreground leading-relaxed">
-                            {project.longDescription || project.description}
+                            {project.description}
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            {project.tags?.map((tag) => (
+                            {project.tech_stack?.map((tag) => (
                                 <span key={tag} className="px-3 py-1 rounded-lg text-sm bg-muted text-muted-foreground font-medium">
                                     {tag}
                                 </span>
                             ))}
                         </div>
                         <div className="flex gap-4 pt-2">
-                            {project.githubUrl && (
-                                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
+                            {project.github_url && (
+                                <a href={project.github_url} target="_blank" rel="noopener noreferrer"
                                     className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border hover:border-primary text-foreground hover:text-primary transition-all text-sm font-medium">
                                     <Github size={16} /> View Code
                                 </a>
                             )}
-                            {project.demoUrl && (
-                                <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"
+                            {project.live_url && (
+                                <a href={project.live_url} target="_blank" rel="noopener noreferrer"
                                     className="flex items-center gap-2 px-4 py-2 rounded-xl gradient-primary text-white text-sm font-medium shadow-glow hover:shadow-glow-accent transition-all">
                                     <ExternalLink size={16} /> Live Demo
                                 </a>
@@ -145,9 +157,13 @@ export default function Projects() {
     const [selectedProject, setSelectedProject] = useState(null);
 
     useEffect(() => {
-        api.get("/projects")
-            .then((res) => setProjects(res.data.data || []))
-            .catch(() => setProjects([]))
+        projectService
+            .getAll()
+            .then((data) => setProjects(data || []))
+            .catch(() => {
+                console.warn("Supabase not configured, using fallback data");
+                setProjects(FALLBACK_PROJECTS);
+            })
             .finally(() => setLoading(false));
     }, []);
 
@@ -159,7 +175,7 @@ export default function Projects() {
                 <SectionHeading
                     label="Projects"
                     title="Things I've Built"
-                    subtitle="A selection of projects that demonstrate my skills across the full stack."
+                    subtitle="A selection of projects across web dev, AI/CV, design, and hackathons."
                 />
 
                 {/* Filter tabs */}
@@ -188,13 +204,13 @@ export default function Projects() {
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="text-center py-20 text-muted-foreground">
-                        <p>No projects found. Add some via the admin panel!</p>
+                        <p>No projects found in this category.</p>
                     </div>
                 ) : (
                     <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <AnimatePresence>
                             {filtered.map((project) => (
-                                <ProjectCard key={project._id} project={project} onOpen={setSelectedProject} />
+                                <ProjectCard key={project.id} project={project} onOpen={setSelectedProject} />
                             ))}
                         </AnimatePresence>
                     </motion.div>
