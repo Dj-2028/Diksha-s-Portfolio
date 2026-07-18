@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Download } from "lucide-react";
+
 import SectionHeading from "../common/SectionHeading";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 import { useCounterAnimation } from "../../hooks/useCounterAnimation";
@@ -41,10 +41,11 @@ export default function About() {
                             {/* Decorative border */}
                             <div className="absolute -inset-4 rounded-3xl gradient-primary opacity-20 blur-xl" />
                             <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden border-2 border-primary/30 shadow-glow">
-                                {/* Profile monogram */}
-                                <div className="w-full h-full bg-gradient-to-br from-primary/20 via-accent/10 to-primary/5 flex items-center justify-center">
-                                    <span className="font-display text-7xl font-bold gradient-text">DJ</span>
-                                </div>
+                                <img
+                                    src="/Main.png"
+                                    alt="Diksha Jain"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
                             {/* Floating badge */}
                             <motion.div
@@ -84,16 +85,7 @@ export default function About() {
                             shipping things that are both technically deep and visually polished.
                         </p>
 
-                        <div className="pt-2">
-                            <a
-                                href="/resume.pdf"
-                                download
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-all duration-300"
-                            >
-                                <Download size={16} />
-                                Download Resume
-                            </a>
-                        </div>
+
                     </motion.div>
                 </div>
 

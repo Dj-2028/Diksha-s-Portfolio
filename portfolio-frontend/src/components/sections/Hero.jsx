@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, ArrowDown, ChevronDown, ExternalLink } from "lucide-react";
+import { ArrowDown, ChevronDown, ExternalLink } from "lucide-react";
 import { SOCIAL_LINKS } from "../../lib/constants";
 
 const roles = [
@@ -112,14 +112,7 @@ export default function Hero() {
                         View My Projects
                         <ArrowDown size={16} />
                     </a>
-                    <a
-                        href="/resume.pdf"
-                        download
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-card text-foreground font-semibold hover:border-primary hover:text-primary transition-all duration-300 hover:scale-105"
-                    >
-                        <Download size={16} />
-                        Download Resume
-                    </a>
+
                     <a
                         href="https://graphic-portfolio-nine.vercel.app"
                         target="_blank"
